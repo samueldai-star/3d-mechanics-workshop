@@ -10,3 +10,5 @@
 ## 協作流程
 
 視覺設計在 Claude Design 中製作與調整，透過 design-sync 與本機專案同步；程式邏輯與整合由 Claude Code 完成。
+
+已連結的 Claude Design 專案設定見 `design/.design-sync.json`。

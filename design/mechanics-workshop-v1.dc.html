@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin:0; padding:0; background:#0d0906; height:100%; overflow:hidden; }
+  * { box-sizing:border-box; }
+  a { color:#c8873f; }
+  a:hover { color:#e5a860; }
+  @keyframes emberPulse { 0%,100% { opacity:.55; transform:scale(1);} 50% { opacity:1; transform:scale(1.14);} }
+  @keyframes panelIn { from { opacity:0; transform:translateY(18px) scale(.985);} to { opacity:1; transform:none;} }
+  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="position:relative; width:100vw; height:100vh; background:#0d0906; font-family:'Noto Sans TC',sans-serif; overflow:hidden; user-select:none;">
+
+  <div ref="{{ mountRef }}" style="position:absolute; inset:0;"></div>
+
+  <div style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 38%, rgba(8,4,2,.72) 100%);"></div>
+
+  <div ref="{{ hs0Ref }}" onClick="{{ open0 }}" style="position:absolute; left:0; top:0; transform:translate(-50%,-50%); pointer-events:auto; cursor:pointer; opacity:0; transition:opacity .25s;">
+    <div style="display:flex; align-items:center; gap:10px; padding:9px 16px 9px 11px; border-radius:999px; background:linear-gradient(180deg, rgba(46,29,16,.94), rgba(28,17,9,.94)); border:1px solid rgba(214,152,74,.5); box-shadow:0 10px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,206,140,.18);">
+      <span style="width:11px; height:11px; border-radius:50%; background:#f0a94b; box-shadow:0 0 14px 4px rgba(240,169,75,.65); animation:emberPulse 2.4s ease-in-out infinite;"></span>
+      <span style="font-family:'Noto Serif TC',serif; font-weight:700; font-size:16px; color:#f5e2c4; letter-spacing:.04em; white-space:nowrap;">{{ hs0Title }}</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#c99a5e; white-space:nowrap;">{{ hs0Sym }}</span>
+    </div>
+  </div>
+  <div ref="{{ hs1Ref }}" onClick="{{ open1 }}" style="position:absolute; left:0; top:0; transform:translate(-50%,-50%); pointer-events:auto; cursor:pointer; opacity:0; transition:opacity .25s;">
+    <div style="display:flex; align-items:center; gap:10px; padding:9px 16px 9px 11px; border-radius:999px; background:linear-gradient(180deg, rgba(46,29,16,.94), rgba(28,17,9,.94)); border:1px solid rgba(214,152,74,.5); box-shadow:0 10px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,206,140,.18);">
+      <span style="width:11px; height:11px; border-radius:50%; background:#f0a94b; box-shadow:0 0 14px 4px rgba(240,169,75,.65); animation:emberPulse 2.4s ease-in-out infinite;"></span>
+      <span style="font-family:'Noto Serif TC',serif; font-weight:700; font-size:16px; color:#f5e2c4; letter-spacing:.04em; white-space:nowrap;">{{ hs1Title }}</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#c99a5e; white-space:nowrap;">{{ hs1Sym }}</span>
+    </div>
+  </div>
+  <div ref="{{ hs2Ref }}" onClick="{{ open2 }}" style="position:absolute; left:0; top:0; transform:translate(-50%,-50%); pointer-events:auto; cursor:pointer; opacity:0; transition:opacity .25s;">
+    <div style="display:flex; align-items:center; gap:10px; padding:9px 16px 9px 11px; border-radius:999px; background:linear-gradient(180deg, rgba(46,29,16,.94), rgba(28,17,9,.94)); border:1px solid rgba(214,152,74,.5); box-shadow:0 10px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,206,140,.18);">
+      <span style="width:11px; height:11px; border-radius:50%; background:#f0a94b; box-shadow:0 0 14px 4px rgba(240,169,75,.65); animation:emberPulse 2.4s ease-in-out infinite;"></span>
+      <span style="font-family:'Noto Serif TC',serif; font-weight:700; font-size:16px; color:#f5e2c4; letter-spacing:.04em; white-space:nowrap;">{{ hs2Title }}</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#c99a5e; white-space:nowrap;">{{ hs2Sym }}</span>
+    </div>
+  </div>
+  <div ref="{{ hs3Ref }}" title="尚未開放" style="position:absolute; left:0; top:0; transform:translate(-50%,-50%); pointer-events:auto; cursor:default; opacity:0; transition:opacity .25s;">
+    <div style="display:flex; align-items:center; gap:10px; padding:9px 16px 9px 11px; border-radius:999px; background:linear-gradient(180deg, rgba(34,26,18,.9), rgba(20,15,10,.9)); border:1px dashed rgba(160,132,98,.55); box-shadow:0 10px 24px rgba(0,0,0,.5);">
+      <span style="width:11px; height:11px; border-radius:50%; background:#6d5e4c;"></span>
+      <span style="font-family:'Noto Serif TC',serif; font-weight:700; font-size:16px; color:#b9a68d; letter-spacing:.04em; white-space:nowrap;">{{ hs3Title }}</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8b7758; white-space:nowrap;">{{ hs3Sym }}</span>
+    </div>
+  </div>
+
+  <div style="position:absolute; left:34px; top:30px; pointer-events:none;">
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.42em; color:#a5763c; text-transform:uppercase;">MECHANICS · UNIT 01</div>
+    <div style="margin-top:8px; font-family:'Noto Serif TC',serif; font-weight:900; font-size:44px; line-height:1.05; color:#f3e3c8; text-shadow:0 4px 26px rgba(0,0,0,.75);">力學工坊</div>
+    <div style="margin-top:10px; font-size:14px; color:#b39a78; letter-spacing:.06em;">點選角落上的火光標記，進入該小節的模擬器</div>
+  </div>
+
+  <div style="position:absolute; left:0; right:0; bottom:26px; display:grid; grid-template-columns:1fr auto 1fr; align-items:end; gap:16px; padding:0 30px; pointer-events:none;">
+  <div></div>
+  <div style="pointer-events:auto; width:max-content; white-space:nowrap; display:flex; align-items:center; gap:10px; padding:10px; border-radius:16px; background:linear-gradient(180deg, rgba(44,29,17,.92), rgba(24,15,9,.94)); border:1px solid rgba(150,106,58,.42); box-shadow:0 18px 44px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,208,145,.14); backdrop-filter:blur(6px);">
+    <button onClick="{{ toggleMode }}" style="display:flex; align-items:center; gap:9px; padding:11px 20px; border-radius:11px; border:1px solid rgba(214,152,74,.45); background:linear-gradient(180deg,#4a2f18,#33200f); color:#f2ddba; font-family:'Noto Sans TC',sans-serif; font-size:15px; font-weight:700; letter-spacing:.05em; cursor:pointer;" style-hover="background:linear-gradient(180deg,#5c3a1d,#3d2612); border-color:rgba(240,178,96,.75);">
+      <span style="width:8px; height:8px; border-radius:50%; background:#f0a94b; box-shadow:0 0 10px 3px rgba(240,169,75,.55);"></span>{{ modeLabel }}
+    </button>
+    <div style="width:1px; height:26px; background:rgba(150,106,58,.34);"></div>
+    <button onClick="{{ resetView }}" style="padding:11px 18px; border-radius:11px; border:1px solid rgba(150,106,58,.35); background:rgba(255,255,255,.03); color:#d9c3a0; font-size:15px; font-weight:500; cursor:pointer;" style-hover="background:rgba(255,255,255,.08); color:#f2ddba;">回到全景</button>
+    <button onClick="{{ toggleFull }}" style="padding:11px 18px; border-radius:11px; border:1px solid rgba(150,106,58,.35); background:rgba(255,255,255,.03); color:#d9c3a0; font-size:15px; font-weight:500; cursor:pointer;" style-hover="background:rgba(255,255,255,.08); color:#f2ddba;">全螢幕投影</button>
+    <div style="width:1px; height:26px; background:rgba(150,106,58,.34);"></div>
+    <div style="padding:0 12px 0 4px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.5; color:#94795a; white-space:nowrap;">{{ hintText }}</div>
+  </div>
+
+  <div style="justify-self:end; pointer-events:auto; display:grid; grid-template-columns:repeat(3,54px); grid-auto-rows:46px; gap:8px; padding:12px; border-radius:16px; background:linear-gradient(180deg, rgba(44,29,17,.92), rgba(24,15,9,.94)); border:1px solid rgba(150,106,58,.42); box-shadow:0 18px 44px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,208,145,.14);">
+    <button onClick="{{ nudgeLeft }}" title="向左轉" style="border-radius:10px; border:1px solid rgba(150,106,58,.4); background:rgba(255,255,255,.04); color:#e2caa4; font-size:17px; cursor:pointer;" style-hover="background:rgba(255,255,255,.11);">◀</button>
+    <button onClick="{{ nudgeUp }}" title="視角上移" style="border-radius:10px; border:1px solid rgba(150,106,58,.4); background:rgba(255,255,255,.04); color:#e2caa4; font-size:17px; cursor:pointer;" style-hover="background:rgba(255,255,255,.11);">▲</button>
+    <button onClick="{{ nudgeRight }}" title="向右轉" style="border-radius:10px; border:1px solid rgba(150,106,58,.4); background:rgba(255,255,255,.04); color:#e2caa4; font-size:17px; cursor:pointer;" style-hover="background:rgba(255,255,255,.11);">▶</button>
+    <button onClick="{{ nudgeIn }}" style="border-radius:10px; border:1px solid rgba(150,106,58,.4); background:rgba(255,255,255,.04); color:#e2caa4; font-family:'Noto Sans TC',sans-serif; font-size:13px; font-weight:700; white-space:nowrap; cursor:pointer;" style-hover="background:rgba(255,255,255,.11);">{{ zoomLabel }}</button>
+    <button onClick="{{ nudgeDown }}" title="視角下移" style="border-radius:10px; border:1px solid rgba(150,106,58,.4); background:rgba(255,255,255,.04); color:#e2caa4; font-size:17px; cursor:pointer;" style-hover="background:rgba(255,255,255,.11);">▼</button>
+    <button onClick="{{ nudgeOut }}" style="border-radius:10px; border:1px solid rgba(150,106,58,.4); background:rgba(255,255,255,.04); color:#e2caa4; font-family:'Noto Sans TC',sans-serif; font-size:13px; font-weight:700; white-space:nowrap; cursor:pointer;" style-hover="background:rgba(255,255,255,.11);">{{ zoomOutLabel }}</button>
+  </div>
+  </div>
+
+  <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; z-index:20; display:flex; flex-direction:column; padding:26px; background:linear-gradient(180deg, rgba(10,6,3,.82), rgba(10,6,3,.92)); animation:fadeIn .22s ease both;">
+      <div style="flex:1; display:flex; flex-direction:column; border-radius:22px; overflow:hidden; border:2px solid #8a5f31; background:linear-gradient(178deg,#f2e2c6 0%, #ecd8b6 42%, #e5cda6 100%); box-shadow:0 40px 90px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,255,255,.6); animation:panelIn .3s cubic-bezier(.2,.8,.3,1) both;">
+
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:24px; padding:20px 28px; background:linear-gradient(180deg,#c99356,#b07d43); border-bottom:2px solid #8a5f31; box-shadow:inset 0 1px 0 rgba(255,226,183,.5);">
+          <div style="display:flex; align-items:baseline; gap:16px; min-width:0;">
+            <div style="font-family:'Noto Serif TC',serif; font-weight:900; font-size:30px; color:#2f1d0c; letter-spacing:.03em;">{{ pTitle }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:#5b3a17; letter-spacing:.14em;">{{ pSym }}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button onClick="{{ toggleFull }}" style="padding:10px 16px; border-radius:9px; border:1px solid #8a5f31; background:rgba(255,246,230,.5); color:#3d2711; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;" style-hover="background:#fff6e6;">全螢幕投影</button>
+            <button onClick="{{ closePanel }}" style="padding:10px 20px; border-radius:9px; border:1px solid #6b4520; background:linear-gradient(180deg,#8a5f31,#6f4a24); color:#f8ecd8; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;" style-hover="background:linear-gradient(180deg,#9c6d3a,#7d5429);">← 回到工坊全景</button>
+          </div>
+        </div>
+
+        <div style="flex:1; display:grid; grid-template-columns:1fr 320px; gap:22px; padding:22px; min-height:0;">
+          <div style="display:flex; flex-direction:column; gap:14px; min-height:0;">
+            <div style="flex:1; border-radius:14px; border:2px dashed #b28a55; background:repeating-linear-gradient(45deg, rgba(255,248,235,.75) 0 12px, rgba(240,226,201,.75) 12px 24px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; min-height:0;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:.2em; color:#8a6a3f;">SIMULATION CANVAS</div>
+              <div style="font-family:'Noto Serif TC',serif; font-size:22px; font-weight:700; color:#5b3f1e;">{{ pTitle }}模擬區</div>
+              <div style="font-size:13.5px; color:#8a6a3f;">互動元件（拖曳箭頭／彈簧等）依既定規格後續嵌入此區</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px; padding:16px 22px; border-radius:12px; background:linear-gradient(180deg,#fbf3e3,#f3e6cd); border:1px solid #cfae7d; box-shadow:inset 0 1px 0 #fff;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.18em; color:#9a7743;">FORMULA</div>
+              <div style="font-family:'Noto Serif TC',serif; font-size:30px; font-weight:700; color:#33200e; letter-spacing:.02em;">{{ pFormula }}</div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px; padding:18px; border-radius:14px; background:linear-gradient(180deg,#fbf4e5,#f1e2c6); border:1px solid #cfae7d; box-shadow:inset 0 1px 0 #fff; overflow:auto;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.2em; color:#9a7743;">LIVE DATA</div>
+            <sc-for list="{{ pReadouts }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:10px; background:rgba(255,255,255,.62); border:1px solid #ddc399;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:600; color:#6b4a22;">{{ r.k }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600; color:#2f1d0c;">{{ r.v }}</span>
+              </div>
+            </sc-for>
+            <div style="margin-top:auto; padding-top:12px; font-size:12.5px; line-height:1.7; color:#8a6a3f; border-top:1px dashed #cfae7d;">數值為示意佔位，接上模擬器後即時更新。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const CORNERS = [
+  { id:'vector', title:'力的合成分解', sym:'F₁ + F₂ = ΣF', pos:[-5.0,2.6,-3.2], formula:'ΣF = F₁ + F₂',
+    readouts:[{k:'F₁',v:'—— N'},{k:'F₂',v:'—— N'},{k:'θ',v:'——°'},{k:'ΣF',v:'—— N'}] },
+  { id:'spring', title:'彈簧張力', sym:'F = kx', pos:[4.6,1.9,-3.4], formula:'F = k · x',
+    readouts:[{k:'k',v:'—— N/m'},{k:'x',v:'—— m'},{k:'F',v:'—— N'},{k:'Eₚ',v:'—— J'}] },
+  { id:'normal', title:'正向力', sym:'N = mg cosθ', pos:[4.8,1.3,3.2], formula:'N = m g cos θ',
+    readouts:[{k:'m',v:'—— kg'},{k:'θ',v:'——°'},{k:'N',v:'—— N'},{k:'a',v:'—— m/s²'}] },
+  { id:'friction', title:'摩擦力（即將開放）', sym:'f = μN', pos:[-5.0,1.3,3.4], formula:'f = μ · N',
+    readouts:[{k:'μ',v:'——'},{k:'N',v:'—— N'},{k:'f',v:'—— N'}] }
+];
+
+class Component extends DCLogic {
+  state = { mode:'orbit', panel:null, ready:false };
+
+  constructor(p){
+    super(p);
+    this.mount = React.createRef();
+    this.root = React.createRef();
+    this.hs = [React.createRef(),React.createRef(),React.createRef(),React.createRef()];
+    this.keys = {};
+  }
+
+  componentDidMount(){ this.boot().catch(e => console.error('[workshop boot]', e)); }
+  componentWillUnmount(){
+    cancelAnimationFrame(this._raf);
+    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('keydown', this._kd);
+    window.removeEventListener('keyup', this._ku);
+    if (this.renderer) this.renderer.dispose();
+  }
+
+  async boot(){
+    const THREE = await import('https://esm.sh/three@0.161.0');
+    const { OrbitControls } = await import('https://esm.sh/three@0.161.0/examples/jsm/controls/OrbitControls.js');
+    this.THREE = THREE;
+    const el = this.mount.current; if (!el) return;
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(el.clientWidth, el.clientHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    el.appendChild(renderer.domElement);
+    this.renderer = renderer;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#120b06');
+    scene.fog = new THREE.FogExp2('#120b06', 0.030);
+    this.scene = scene;
+
+    const camera = new THREE.PerspectiveCamera(48, el.clientWidth/el.clientHeight, 0.1, 200);
+    camera.position.set(0, 4.4, 12.5);
+    this.camera = camera;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 2.0, 0);
+    controls.enableDamping = true; controls.dampingFactor = 0.07;
+    controls.minDistance = 4; controls.maxDistance = 20;
+    controls.maxPolarAngle = Math.PI*0.495;
+    this.controls = controls;
+    this.home = { pos: camera.position.clone(), target: controls.target.clone() };
+
+    this.buildWorld();
+
+    this._onResize = () => {
+      const w = el.clientWidth, h = el.clientHeight;
+      camera.aspect = w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h);
+    };
+    window.addEventListener('resize', this._onResize);
+    this._kd = e => { this.keys[e.code] = true; if (e.code === 'Escape') this.setState({ panel:null }); };
+    this._ku = e => { this.keys[e.code] = false; };
+    window.addEventListener('keydown', this._kd); window.addEventListener('keyup', this._ku);
+
+    this.clock = new THREE.Clock();
+    window.__ws = this;
+    // keyboard also from the canvas itself (iframe focus safety)
+    renderer.domElement.tabIndex = 0;
+    renderer.domElement.addEventListener('pointerdown', () => renderer.domElement.focus());
+    renderer.domElement.addEventListener('keydown', e => { this.keys[e.code] = true; });
+    renderer.domElement.addEventListener('keyup', e => { this.keys[e.code] = false; });
+    this.setState({ ready:true });
+    this.loop();
+  }
+
+  // ---- procedural materials ----
+  woodTex(base, dark, w, h, rot){
+    const THREE = this.THREE;
+    const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+    const x = c.getContext('2d');
+    x.fillStyle = base; x.fillRect(0,0,256,256);
+    for (let i=0;i<170;i++){
+      const y = Math.random()*256;
+      x.globalAlpha = 0.05 + Math.random()*0.16;
+      x.strokeStyle = Math.random() > 0.35 ? dark : '#ffffff';
+      x.lineWidth = 0.4 + Math.random()*2.2;
+      x.beginPath(); x.moveTo(0, y);
+      x.bezierCurveTo(85, y + (Math.random()-0.5)*13, 170, y + (Math.random()-0.5)*13, 256, y + (Math.random()-0.5)*7);
+      x.stroke();
+    }
+    x.globalAlpha = 1;
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(w||1, h||1);
+    if (rot) t.rotation = Math.PI/2;
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+  wood(base, dark, rw, rh, rough){
+    const THREE = this.THREE;
+    return new THREE.MeshStandardMaterial({ map:this.woodTex(base,dark,rw,rh), roughness:rough==null?0.86:rough, metalness:0.04 });
+  }
+  metal(color, rough){
+    const THREE = this.THREE;
+    return new THREE.MeshStandardMaterial({ color, roughness:rough==null?0.42:rough, metalness:0.85 });
+  }
+
+  box(w,h,d,mat,x,y,z,rx,ry,rz){
+    const THREE = this.THREE;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat);
+    m.position.set(x,y,z); if(rx)m.rotation.x=rx; if(ry)m.rotation.y=ry; if(rz)m.rotation.z=rz;
+    m.castShadow = true; m.receiveShadow = true; this.scene.add(m); return m;
+  }
+  cyl(rt,rb,h,seg,mat,x,y,z,rx,ry,rz){
+    const THREE = this.THREE;
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg), mat);
+    m.position.set(x,y,z); if(rx)m.rotation.x=rx; if(ry)m.rotation.y=ry; if(rz)m.rotation.z=rz;
+    m.castShadow = true; m.receiveShadow = true; this.scene.add(m); return m;
+  }
+  rope(a,b,mat){
+    const THREE = this.THREE;
+    const va = new THREE.Vector3(...a), vb = new THREE.Vector3(...b);
+    const len = va.distanceTo(vb);
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,len,8), mat);
+    m.position.copy(va).add(vb).multiplyScalar(0.5);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), vb.clone().sub(va).normalize());
+    m.castShadow = true; this.scene.add(m); return m;
+  }
+
+  buildWorld(){
+    const THREE = this.THREE, S = this.scene;
+    const floorMat = this.wood('#5a3a20','#2e1b0c', 9, 7, 0.92);
+    const wallMat  = this.wood('#43301c','#241609', 7, 3, 0.95);
+    const beamMat  = this.wood('#6b4526','#33200f', 3, 1, 0.8);
+    const benchMat = this.wood('#7a5330','#3c2512', 2, 2, 0.7);
+    const iron = this.metal('#4b4741', 0.5);
+    const brass = this.metal('#a97a2f', 0.34);
+    const ropeMat = new THREE.MeshStandardMaterial({ color:'#b79461', roughness:0.95 });
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(18,15), floorMat);
+    floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; S.add(floor);
+
+    // walls
+    const back = new THREE.Mesh(new THREE.PlaneGeometry(18,8), wallMat);
+    back.position.set(0,4,-7.5); back.receiveShadow = true; S.add(back);
+    const left = new THREE.Mesh(new THREE.PlaneGeometry(15,8), wallMat);
+    left.position.set(-9,4,0); left.rotation.y = Math.PI/2; left.receiveShadow = true; S.add(left);
+    const right = new THREE.Mesh(new THREE.PlaneGeometry(15,8), wallMat);
+    right.position.set(9,4,0); right.rotation.y = -Math.PI/2; right.receiveShadow = true; S.add(right);
+
+    // ceiling beams + posts
+    for (let i=-2;i<=2;i++) this.box(17.6,0.42,0.55, beamMat, 0, 5.6, i*3.0);
+    this.box(0.6,0.5,14.6, beamMat, -3.4, 6.0, 0);
+    this.box(0.6,0.5,14.6, beamMat, 3.4, 6.0, 0);
+    [[-8.2,-7.0],[8.2,-7.0],[-8.2,6.6],[8.2,6.6]].forEach(([x,z]) => this.cyl(0.28,0.34,5.6,10, beamMat, x, 2.8, z));
+    // diagonal braces
+    this.box(0.28,3.2,0.28, beamMat, -7.2, 4.4, -7.0, 0,0, Math.PI/5);
+    this.box(0.28,3.2,0.28, beamMat, 7.2, 4.4, -7.0, 0,0,-Math.PI/5);
+
+    // ---- lighting: warm, high-contrast workshop ----
+    S.add(new THREE.AmbientLight('#6b4b30', 0.42));
+    S.add(new THREE.HemisphereLight('#8a6a44', '#1a0f07', 0.35));
+    const forge = new THREE.PointLight('#ff7a24', 26, 16, 2);
+    forge.position.set(6.6, 1.5, -6.2); forge.castShadow = true;
+    forge.shadow.mapSize.set(1024,1024); S.add(forge);
+    this.forge = forge;
+    const key = new THREE.SpotLight('#ffca82', 90, 26, 0.66, 0.5, 1.6);
+    key.position.set(-2.5, 7.2, 4.0); key.target.position.set(-1,1,-1);
+    key.castShadow = true; key.shadow.mapSize.set(2048,2048); key.shadow.bias = -0.0012;
+    S.add(key); S.add(key.target);
+
+    // lanterns
+    this.lanterns = [];
+    [[-6.4,4.0,-2.2],[5.6,4.2,1.6],[-1.0,4.6,-6.0],[-6.0,4.0,4.4]].forEach(([x,y,z]) => {
+      this.rope([x,5.5,z],[x,y+0.28,z], ropeMat);
+      const cage = new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.3,0.5,8),
+        new THREE.MeshStandardMaterial({ color:'#3a2c1c', roughness:0.6, metalness:0.6 }));
+      cage.position.set(x,y,z); S.add(cage);
+      const glow = new THREE.Mesh(new THREE.SphereGeometry(0.16,14,14),
+        new THREE.MeshBasicMaterial({ color:'#ffc46a' }));
+      glow.position.set(x,y,z); S.add(glow);
+      const pl = new THREE.PointLight('#ffab4d', 9, 9.5, 2);
+      pl.position.set(x,y,z); S.add(pl);
+      this.lanterns.push(pl);
+    });
+
+    // ---- corner A: rope & pulley (vector) ----
+    this.box(3.6,0.34,0.34, beamMat, -5.0, 4.5, -3.2);
+    [-5.9,-4.1].forEach(x => {
+      const w = new THREE.Mesh(new THREE.TorusGeometry(0.34,0.11,10,26), brass);
+      w.position.set(x,4.25,-3.2); w.castShadow = true; S.add(w);
+      this.cyl(0.07,0.07,0.34,10, iron, x,4.25,-3.2, Math.PI/2);
+    });
+    this.rope([-5.9,4.25,-3.2],[-5.0,2.5,-3.2], ropeMat);
+    this.rope([-4.1,4.25,-3.2],[-5.0,2.5,-3.2], ropeMat);
+    this.rope([-5.0,2.5,-3.2],[-5.0,1.4,-3.2], ropeMat);
+    const weight = this.cyl(0.32,0.38,0.7,14, iron, -5.0, 1.05, -3.2);
+    weight.material = this.metal('#3f3b36', 0.55);
+    // coiled rope on floor
+    for (let i=0;i<3;i++){
+      const t = new THREE.Mesh(new THREE.TorusGeometry(0.45-i*0.1,0.06,8,24), ropeMat);
+      t.rotation.x = -Math.PI/2; t.position.set(-6.8, 0.06+i*0.1, -1.4); t.castShadow=true; S.add(t);
+    }
+
+    // ---- corner B: workbench + anvil + spring (spring tension) ----
+    this.box(3.8,0.22,2.0, benchMat, 4.6, 1.05, -3.4);
+    [[3.0,-2.6],[6.2,-2.6],[3.0,-4.2],[6.2,-4.2]].forEach(([x,z]) => this.box(0.24,1.05,0.24, beamMat, x, 0.52, z));
+    // anvil
+    this.box(1.15,0.34,0.5, this.metal('#39352f',0.48), 4.3, 1.35, -3.4);
+    this.box(0.4,0.3,0.36, this.metal('#39352f',0.48), 4.3, 1.06, -3.4);
+    // spring coil
+    const coilPts = [];
+    for (let i=0;i<=120;i++){ const t=i/120; coilPts.push(new THREE.Vector3(Math.cos(t*Math.PI*11)*0.16, 1.9 - t*0.75, -3.4 + Math.sin(t*Math.PI*11)*0.16).add(new THREE.Vector3(5.9,0,0))); }
+    const coil = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(coilPts), 220, 0.035, 7, false), this.metal('#9aa0a6', 0.3));
+    coil.castShadow = true; S.add(coil);
+    this.box(1.4,0.2,0.2, beamMat, 5.9, 2.05, -3.4);
+    this.box(0.3,0.3,0.3, this.metal('#4a4640',0.5), 5.9, 1.0, -3.4);
+    // hammer + tongs on bench
+    this.cyl(0.045,0.05,0.85,8, beamMat, 5.3, 1.2, -2.95, Math.PI/2, 0, 0.1);
+    this.box(0.3,0.15,0.15, this.metal('#3f3b36',0.5), 5.75, 1.22, -2.95);
+
+    // ---- corner C: inclined plane (normal force) ----
+    const ramp = this.box(3.4,0.16,2.0, benchMat, 4.8, 0.72, 3.2, 0, 0, -Math.PI/9);
+    const rampSide = new THREE.Mesh(new THREE.BufferGeometry(), benchMat); rampSide.visible=false; S.add(rampSide);
+    this.box(0.24,1.5,1.9, beamMat, 6.3, 0.75, 3.2);
+    this.box(3.6,0.16,2.2, beamMat, 4.8, 0.08, 3.2);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.3,26,20), this.metal('#8d6a3a', 0.35));
+    ball.position.set(4.4, 1.28, 3.2); ball.castShadow = true; S.add(ball);
+    this.ball = ball; this.ramp = ramp;
+    // crate at ramp foot
+    this.box(0.8,0.8,0.8, this.wood('#6d4826','#33200f',1,1,0.85), 3.0, 0.4, 4.4, 0, 0.5, 0);
+
+    // ---- corner D: friction (placeholder / empty station) ----
+    this.box(2.6,0.2,1.4, benchMat, -5.0, 0.9, 3.4);
+    [[-6.1,2.9],[-3.9,2.9],[-6.1,3.9],[-3.9,3.9]].forEach(([x,z]) => this.box(0.2,0.9,0.2, beamMat, x, 0.45, z));
+    const cloth = this.box(1.4,0.06,0.9, new THREE.MeshStandardMaterial({ color:'#6c4a3a', roughness:1 }), -5.0, 1.03, 3.4);
+    cloth.castShadow = true;
+
+    // ---- wall dressing: gears, tools ----
+    this.gears = [];
+    [[-2.4,3.5,-7.3,1.1,0.16],[-0.9,4.3,-7.3,0.66,-0.26],[0.35,3.1,-7.3,0.5,0.34]].forEach(([x,y,z,r,sp]) => {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.16,26), brass);
+      body.rotation.x = Math.PI/2; body.castShadow = true; g.add(body);
+      const teeth = Math.max(10, Math.round(r*18));
+      for (let i=0;i<teeth;i++){
+        const t = new THREE.Mesh(new THREE.BoxGeometry(r*0.22, r*0.26, 0.16), brass);
+        const a = (i/teeth)*Math.PI*2;
+        t.position.set(Math.cos(a)*r*1.05, Math.sin(a)*r*1.05, 0); t.rotation.z = a; t.castShadow = true; g.add(t);
+      }
+      g.position.set(x,y,z); S.add(g); this.gears.push({ g, sp });
+    });
+    // tool rack
+    this.box(3.0,0.14,0.24, beamMat, 1.6, 2.6, -7.35);
+    for (let i=0;i<5;i++) this.cyl(0.035,0.04,0.75+Math.random()*0.4,7, i%2?iron:beamMat, 0.5+i*0.55, 2.15, -7.3);
+
+    // forge glow block
+    this.box(1.9,1.1,1.4, new THREE.MeshStandardMaterial({ color:'#2b211a', roughness:1 }), 6.8, 0.55, -6.2);
+    const emb = new THREE.Mesh(new THREE.BoxGeometry(1.0,0.1,0.8), new THREE.MeshBasicMaterial({ color:'#ff6a1a' }));
+    emb.position.set(6.8, 1.13, -6.2); S.add(emb);
+
+    // dust motes
+    const g = new THREE.BufferGeometry();
+    const n = 340, arr = new Float32Array(n*3);
+    for (let i=0;i<n;i++){ arr[i*3]=(Math.random()-0.5)*16; arr[i*3+1]=Math.random()*5.4+0.3; arr[i*3+2]=(Math.random()-0.5)*13; }
+    g.setAttribute('position', new THREE.BufferAttribute(arr,3));
+    this.motes = new THREE.Points(g, new THREE.PointsMaterial({ color:'#ffcb8a', size:0.045, transparent:true, opacity:0.5 }));
+    S.add(this.motes);
+
+    this.anchors = CORNERS.map(c => new THREE.Vector3(...c.pos));
+  }
+
+  loop = () => {
+    this._raf = requestAnimationFrame(this.loop);
+    const dt = Math.min(this.clock.getDelta(), 0.05);
+    this._t = (this._t || 0) + dt;
+    const t = this._t;
+
+    if (this.forge) this.forge.intensity = 22 + Math.sin(t*7.3)*3 + Math.sin(t*2.1)*2.5;
+    if (this.lanterns) this.lanterns.forEach((l,i) => l.intensity = 8.4 + Math.sin(t*3.1+i*1.7)*0.9);
+    if (this.gears) this.gears.forEach(o => o.g.rotation.z += o.sp*dt*0.5);
+    if (this.motes) this.motes.rotation.y = t*0.012;
+    if (this.ball) this.ball.position.y = 1.28 + Math.sin(t*1.4)*0.012;
+
+    if (this.state.mode === 'walk') this.walkStep(dt);
+    this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+    this.projectHotspots();
+  };
+
+  walkStep(dt){
+    const THREE = this.THREE, k = this.keys, cam = this.camera, c = this.controls;
+    const fwd = new THREE.Vector3(); cam.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+    const rightV = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0,1,0));
+    const speed = (k['ShiftLeft'] ? 7 : 3.6) * dt;
+    const mv = new THREE.Vector3();
+    if (k['KeyW']||k['ArrowUp']) mv.add(fwd);
+    if (k['KeyS']||k['ArrowDown']) mv.sub(fwd);
+    if (k['KeyD']||k['ArrowRight']) mv.add(rightV);
+    if (k['KeyA']||k['ArrowLeft']) mv.sub(rightV);
+    if (mv.lengthSq() === 0) return;
+    mv.normalize().multiplyScalar(speed);
+    const nx = THREE.MathUtils.clamp(cam.position.x + mv.x, -8.2, 8.2);
+    const nz = THREE.MathUtils.clamp(cam.position.z + mv.z, -6.6, 6.6);
+    const d = new THREE.Vector3(nx - cam.position.x, 0, nz - cam.position.z);
+    cam.position.add(d); c.target.add(d);
+  }
+
+  projectHotspots(){
+    if (!this.anchors) return;
+    const el = this.mount.current; if (!el) return;
+    const w = el.clientWidth, h = el.clientHeight, hidden = !!this.state.panel;
+    this.anchors.forEach((a, i) => {
+      const node = this.hs[i].current; if (!node) return;
+      const v = a.clone().project(this.camera);
+      const behind = v.z > 1;
+      if (hidden || behind){ node.style.opacity = '0'; node.style.pointerEvents = 'none'; return; }
+      const dist = this.camera.position.distanceTo(a);
+      node.style.opacity = String(Math.max(0.25, Math.min(1, 22/dist - 0.15)));
+      node.style.pointerEvents = 'auto';
+      node.style.transform = `translate(-50%,-50%) scale(${Math.max(0.72, Math.min(1.05, 13/dist))})`;
+      node.style.left = ((v.x*0.5+0.5)*w) + 'px';
+      node.style.top  = ((-v.y*0.5+0.5)*h) + 'px';
+    });
+  }
+
+  focusCorner(i){
+    const THREE = this.THREE; if (!THREE) return;
+    const a = this.anchors[i];
+    const dir = new THREE.Vector3(a.x*0.42, 0, a.z*0.42).normalize().multiplyScalar(-1);
+    const to = a.clone().add(new THREE.Vector3(-dir.x*4.6, 1.1, -dir.z*4.6));
+    this.tween(to, a.clone().add(new THREE.Vector3(0,-0.5,0)), 700);
+  }
+
+  tween(pos, target, ms){
+    const c = this.controls, cam = this.camera;
+    const p0 = cam.position.clone(), t0 = c.target.clone(), start = performance.now();
+    const step = () => {
+      const k = Math.min(1, (performance.now()-start)/ms);
+      const e = k<0.5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+      cam.position.lerpVectors(p0, pos, e); c.target.lerpVectors(t0, target, e);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    step();
+  }
+
+  // on-screen view nudges — work even when drag input is unavailable (touch screen / embedded view)
+  nudge(kind){
+    const THREE = this.THREE; if (!THREE) return;
+    const cam = this.camera, c = this.controls;
+    if (kind === 'left' || kind === 'right'){
+      const a = (kind === 'left' ? 1 : -1) * Math.PI/12;
+      const off = cam.position.clone().sub(c.target);
+      const to = c.target.clone().add(off.applyAxisAngle(new THREE.Vector3(0,1,0), a));
+      this.tween(to, c.target.clone(), 320);
+    } else if (kind === 'up' || kind === 'down'){
+      const off = cam.position.clone().sub(c.target);
+      const sph = new THREE.Spherical().setFromVector3(off);
+      sph.phi = THREE.MathUtils.clamp(sph.phi + (kind === 'up' ? -0.16 : 0.16), 0.22, Math.PI*0.49);
+      const to = c.target.clone().add(new THREE.Vector3().setFromSpherical(sph));
+      this.tween(to, c.target.clone(), 320);
+    } else {
+      const fwd = new THREE.Vector3().subVectors(c.target, cam.position);
+      const dist = fwd.length(); fwd.normalize();
+      if (this.state.mode === 'walk'){
+        const step = fwd.clone().setY(0).normalize().multiplyScalar(kind === 'in' ? 1.4 : -1.4);
+        const to = cam.position.clone().add(step);
+        to.x = THREE.MathUtils.clamp(to.x, -8.2, 8.2); to.z = THREE.MathUtils.clamp(to.z, -6.6, 6.6);
+        this.tween(to, c.target.clone().add(to.clone().sub(cam.position)), 320);
+      } else {
+        const nd = THREE.MathUtils.clamp(dist + (kind === 'in' ? -1.8 : 1.8), 4, 20);
+        const to = c.target.clone().add(fwd.clone().multiplyScalar(-nd));
+        this.tween(to, c.target.clone(), 320);
+      }
+    }
+  }
+
+  openCorner(i){
+    this.focusCorner(i);
+    setTimeout(() => this.setState({ panel:i }), 420);
+  }
+
+  renderVals(){
+    const p = this.state.panel == null ? null : CORNERS[this.state.panel];
+    const walk = this.state.mode === 'walk';
+    return {
+      rootRef: this.root, mountRef: this.mount,
+      hs0Ref: this.hs[0], hs1Ref: this.hs[1], hs2Ref: this.hs[2], hs3Ref: this.hs[3],
+      hs0Title: CORNERS[0].title, hs0Sym: CORNERS[0].sym,
+      hs1Title: CORNERS[1].title, hs1Sym: CORNERS[1].sym,
+      hs2Title: CORNERS[2].title, hs2Sym: CORNERS[2].sym,
+      hs3Title: CORNERS[3].title, hs3Sym: CORNERS[3].sym,
+      open0: () => this.openCorner(0), open1: () => this.openCorner(1),
+      open2: () => this.openCorner(2), open3: () => this.openCorner(3),
+      modeLabel: walk ? '漫步模式' : '軌道模式',
+      hintText: walk ? 'W A S D / 方向鍵 移動 · 拖曳轉頭 · Shift 加速' : '拖曳旋轉 · 滾輪推近 · 右鍵平移',
+      toggleMode: () => {
+        const next = walk ? 'orbit' : 'walk';
+        if (this.controls){
+          this.controls.enablePan = next === 'orbit';
+          if (next === 'walk'){
+            const THREE = this.THREE, cam = this.camera, c = this.controls;
+            const dir = new THREE.Vector3().subVectors(c.target, cam.position).setY(0).normalize();
+            cam.position.set(cam.position.x, 1.62, cam.position.z);
+            c.target.copy(cam.position).add(dir.multiplyScalar(2.4)).setY(1.5);
+            c.minDistance = 1.6; c.maxDistance = 3.2;
+          } else {
+            this.controls.minDistance = 4; this.controls.maxDistance = 20;
+          }
+        }
+        this.setState({ mode: next });
+      },
+      resetView: () => {
+        this.setState({ panel:null, mode:'orbit' });
+        if (this.controls){ this.controls.minDistance = 4; this.controls.maxDistance = 20; this.controls.enablePan = true; }
+        if (this.home) this.tween(this.home.pos, this.home.target, 800);
+      },
+      toggleFull: () => {
+        const el = this.root.current || document.documentElement;
+        if (document.fullscreenElement) document.exitFullscreen();
+        else if (el.requestFullscreen) el.requestFullscreen();
+      },
+      nudgeLeft: () => this.nudge('left'), nudgeRight: () => this.nudge('right'),
+      nudgeUp: () => this.nudge('up'), nudgeDown: () => this.nudge('down'),
+      nudgeIn: () => this.nudge('in'), nudgeOut: () => this.nudge('out'),
+      zoomLabel: walk ? '前進' : '推近', zoomOutLabel: walk ? '後退' : '拉遠',
+      closePanel: () => this.setState({ panel:null }),
+      panelOpen: this.state.panel != null,
+      pTitle: p ? p.title : '', pSym: p ? p.sym : '',
+      pFormula: p ? p.formula : '', pReadouts: p ? p.readouts : []
+    };
+  }
+}
+
+</script>
+</body>
+</html>

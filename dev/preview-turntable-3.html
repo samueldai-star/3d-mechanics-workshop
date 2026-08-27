@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>預覽 · turntable:3 力矩方向 3D 右手定則</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin:0; height:100%; background:#0e0906; font-family:'Noto Sans TC',sans-serif; }
+  #wrap { display:flex; align-items:center; justify-content:center; height:100%; padding:28px; box-sizing:border-box; }
+  #card { width:min(960px, 100%); height:min(620px, 100%); border-radius:20px; border:2px solid #8a5f31;
+    background:linear-gradient(178deg,#f4e6cd 0%, #eedaba 40%, #e7d0aa 100%); box-shadow:0 40px 90px rgba(0,0,0,.6);
+    display:flex; flex-direction:column; overflow:hidden; }
+  #head { padding:16px 22px; background:linear-gradient(180deg,#cb9557,#b17e44); border-bottom:2px solid #8a5f31;
+    color:#2f1d0c; font-family:'Noto Serif TC',serif; font-weight:900; font-size:20px; display:flex; align-items:center; gap:12px; }
+  #head span { font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:12px; color:#5b3a17; }
+  #body { flex:1; display:grid; grid-template-columns:1fr 260px; gap:16px; padding:18px; min-height:0; }
+  #slot { position:relative; border-radius:14px; border:1px solid #b28a55;
+    background:linear-gradient(180deg, rgba(255,251,242,.86), rgba(246,235,214,.86)); min-height:0; }
+  #side { display:flex; flex-direction:column; gap:10px; padding:15px; border-radius:14px;
+    background:linear-gradient(180deg,#fdf7e9,#f2e4c9); border:1px solid #cfae7d; overflow:auto; }
+  #side h3 { margin:0 0 4px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7e97ab; }
+  .ro { display:flex; justify-content:space-between; padding:10px 12px; border-radius:9px; background:rgba(255,255,255,.66); border:1px solid #ddc399; }
+  .rok { font-family:'IBM Plex Mono',monospace; font-size:13.5px; font-weight:600; color:#6b4a22; }
+  .rov { font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:#2f1d0c; }
+  #resetBtn { margin-top:auto; padding:9px; border-radius:9px; border:1px solid #8a5f31; background:#fff6e6; color:#3d2711;
+    font-size:13px; font-weight:700; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="card">
+    <div id="head">旋轉圓盤平台 <span>τ = r F sin θ · turntable:3 力矩方向 3D 右手定則</span></div>
+    <div id="body">
+      <div id="slot"></div>
+      <div id="side">
+        <h3>LIVE DATA</h3>
+        <div id="readouts"></div>
+        <button id="resetBtn">重設</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createTurntable3Sim } from '../src/simulators/turntable/3.js';
+
+  const WorkshopSimulators = window.WorkshopSimulators = {
+    _f: {},
+    register(key, factory) { this._f[key] = factory; (this._hosts || []).forEach(h => h()); return this; },
+    get(key) { return this._f[key]; },
+    keys() { return Object.keys(this._f); }
+  };
+  WorkshopSimulators.register('turntable:3', () => createTurntable3Sim());
+
+  const slot = document.getElementById('slot');
+  const readoutsEl = document.getElementById('readouts');
+
+  function paintReadouts(rows) {
+    readoutsEl.innerHTML = rows.map(r => `
+      <div class="ro"><span class="rok">${r.k}</span><span class="rov">${r.v}</span></div>
+    `).join('');
+  }
+
+  const sim = WorkshopSimulators.get('turntable:3')();
+  sim.mount(slot);
+  sim.onReadouts(paintReadouts);
+
+  document.getElementById('resetBtn').addEventListener('click', () => sim.reset());
+</script>
+</body>
+</html>

@@ -19,6 +19,7 @@
   a:hover { color:#e5a860; }
   @keyframes emberPulse { 0%,100% { opacity:.5; transform:scale(1);} 50% { opacity:1; transform:scale(1.16);} }
   @keyframes panelIn { from { opacity:0; transform:translateY(20px) scale(.985);} to { opacity:1; transform:none;} }
+  @keyframes panelExpand { from { opacity:0; transform:translateY(14px);} to { opacity:1; transform:none;} }
   @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
   @keyframes gridBreath { 0%,100% { opacity:.28 } 50% { opacity:.6 } }
   @keyframes spinSlow { to { transform:rotate(360deg) } }
@@ -130,13 +131,13 @@
           </div>
         </div>
 
-        <div data-p-tabs="1" style="position:relative; display:flex; align-items:center; gap:7px; padding:11px 22px; background:linear-gradient(180deg,#f7ecd8,#f0e0c4); border-bottom:1px solid #cfae7d; overflow-x:auto;">
+        <div ref="{{ tabsBarRef }}" data-p-tabs="1" style="position:relative; display:flex; align-items:center; gap:7px; padding:11px 22px; background:linear-gradient(180deg,#f7ecd8,#f0e0c4); border-bottom:1px solid #cfae7d; overflow-x:auto; opacity:0;">
           <sc-for list="{{ pTabs }}" as="tb" hint-placeholder-count="5">
             <div ref="{{ tb.ref }}" onClick="{{ tb.onClick }}" style="padding:8px 15px; border-radius:8px; border:1px solid #d3b184; background:rgba(255,255,255,.5); font-size:13.5px; font-weight:500; color:#6b4a22; white-space:nowrap; cursor:pointer;" style-hover="background:#fff; border-color:#b6883f;">{{ tb.label }}</div>
           </sc-for>
         </div>
 
-        <div style="position:relative; flex:1; display:grid; grid-template-columns:1fr 318px; gap:20px; padding:20px 22px 22px; min-height:0;">
+        <div ref="{{ panelBodyRef }}" style="position:relative; flex:1; display:grid; grid-template-columns:1fr 318px; gap:20px; padding:20px 22px 22px; min-height:0; opacity:0;">
           <div style="display:flex; flex-direction:column; gap:13px; min-height:0;">
             <div data-p-slot="1" style="position:relative; flex:1; border-radius:14px; border:1px solid #b28a55; background:linear-gradient(180deg, rgba(255,251,242,.86), rgba(246,235,214,.86)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; min-height:0; box-shadow:inset 0 0 0 1px rgba(120,175,215,.28), inset 0 1px 0 #fff;">
               <div style="position:absolute; left:0; top:0; width:26px; height:26px; border-left:2px solid rgba(60,140,190,.5); border-top:2px solid rgba(60,140,190,.5); border-top-left-radius:13px;"></div>
@@ -312,7 +313,7 @@ CORNERS.forEach(c => { c.area = 'workshop'; });
 ].forEach(c => { c.pos = [c.pos[0] + AREA(c.area).ox, c.pos[1], c.pos[2]]; CORNERS.push(c); });
 
 class Component extends DCLogic {
-  state = { mode:'orbit', panel:null, tab:0, mapOpen:true, here:null, area:'workshop' };
+  state = { mode:'orbit', panel:null, tab:0, mapOpen:true, here:null, area:'workshop', panelPhase:'shell' };
 
   constructor(p){
     super(p);
@@ -332,6 +333,8 @@ class Component extends DCLogic {
     this.diag = React.createRef();
     this.slot = React.createRef();
     this.slotHint = React.createRef();
+    this.tabsBar = React.createRef();
+    this.panelBody = React.createRef();
     this.liveDot = React.createRef();
     this.fxRoot = React.createRef(); this.fxFill = React.createRef();
     this.fxVeil = React.createRef(); this.fxLabel = React.createRef(); this.fxSub = React.createRef();
@@ -354,7 +357,26 @@ class Component extends DCLogic {
 
   componentDidUpdate(prevProps, prevState){
     this.paintUi();
+    this.paintPanelPhase();
     if (!prevState || prevState.panel !== this.state.panel || prevState.tab !== this.state.tab) this.syncSim();
+  }
+
+  // 階段一（殼）：面板卡片與標題列先顯示，分頁列／預覽區維持 opacity:0。
+  // 階段二（展開）：鏡頭轉場 + 殼的進場動畫都穩定後，才淡入分頁列與預覽區（見 openCorner）。
+  paintPanelPhase(){
+    const expanded = this.state.panel != null && this.state.panelPhase === 'expanded';
+    [this.tabsBar.current, this.panelBody.current].forEach(el => {
+      if (!el) return;
+      const already = el.style.opacity === '1';
+      if (expanded && !already) {
+        el.style.animation = 'none'; void el.offsetWidth;
+        el.style.animation = 'panelExpand .26s cubic-bezier(.2,.8,.3,1) both';
+      } else if (!expanded) {
+        el.style.animation = 'none';
+      }
+      el.style.opacity = expanded ? '1' : '0';
+      el.style.pointerEvents = expanded ? 'auto' : 'none';
+    });
   }
 
   simKey(){
@@ -495,7 +517,7 @@ class Component extends DCLogic {
     this._kd = e => {
       if (e.isTrusted === false) return;
       this.keys[e.code] = performance.now();
-      if (e.code === 'Escape') this.setState({ panel:null });
+      if (e.code === 'Escape') this.setState({ panel:null, panelPhase:'shell' });
     };
     this._ku = e => { delete this.keys[e.code]; };
     window.addEventListener('keydown', this._kd); window.addEventListener('keyup', this._ku);
@@ -2494,7 +2516,7 @@ class Component extends DCLogic {
     this.controls.minDistance = 4; this.controls.maxDistance = ar.far; this.controls.enablePan = true;
     this.controls.enabled = true; this.controls.enableRotate = true; this.controls.enableZoom = true;
     this._hsSize = {};
-    this.setState({ area:id, panel:null, here:null, mode:'orbit' }, () => this.paintUi());
+    this.setState({ area:id, panel:null, panelPhase:'shell', here:null, mode:'orbit' }, () => this.paintUi());
   }
 
   fxSet(label, sub, fill){
@@ -2549,7 +2571,7 @@ class Component extends DCLogic {
     const a = this.exAnchors && this.exAnchors[idx];
     if (!a || !THREE) return;
     this._busy = true;
-    this.setState({ panel:null });
+    this.setState({ panel:null, panelPhase:'shell' });
     const f = this.fxSet(dest.title, ex.kind === 'back' ? '回到力學工坊' : ex.dest, null);
     if (ex.kind === 'door'){
       this.fxSet(dest.title, ex.dest,
@@ -3105,7 +3127,12 @@ class Component extends DCLogic {
     if (CORNERS[i].area !== this.state.area || this._busy) return;
     if (this.anchors && CORNERS[i].area === 'workshop') this.pulseToward(this.anchors[i]);
     this.focusCorner(i);
-    setTimeout(() => this.setState({ panel:i, tab:0 }), 430);
+    // 階段一：等鏡頭轉場（focusCorner 的 720ms tween）完全結束，才顯示模擬器外殼（僅標題列，無分頁/預覽）。
+    setTimeout(() => {
+      this.setState({ panel:i, tab:0, panelPhase:'shell' });
+      // 階段二：殼的進場動畫（panelIn .28s）穩定後，才展開分頁列與預覽畫面。
+      setTimeout(() => this.setState({ panelPhase:'expanded' }), 300);
+    }, 720);
   }
 
   renderVals(){
@@ -3130,6 +3157,7 @@ class Component extends DCLogic {
       panelRootRef: this.panelRoot,
       diagRef: this.diag,
       slotRef: this.slot, slotHintRef: this.slotHint, liveDotRef: this.liveDot,
+      tabsBarRef: this.tabsBar, panelBodyRef: this.panelBody,
       slotKeyLabel: p ? ('等待 repo 模擬器 · ' + p.id + ':' + this.state.tab) : '',
       fxRootRef: this.fxRoot, fxFillRef: this.fxFill, fxVeilRef: this.fxVeil,
       fxLabelRef: this.fxLabel, fxSubRef: this.fxSub,
@@ -3158,7 +3186,7 @@ class Component extends DCLogic {
         this.setState({ mode: next });
       },
       resetView: () => {
-        this.setState({ panel:null, mode:'orbit' });
+        this.setState({ panel:null, panelPhase:'shell', mode:'orbit' });
         if (this.controls){ this.controls.minDistance = 4; this.controls.maxDistance = AREA(this.state.area).far; this.controls.enabled = true; this.controls.enablePan = true; this.controls.enableRotate = true; this.controls.enableZoom = true; }
         if (this.home) this.tween(this.home.pos, this.home.target, 820);
       },
@@ -3172,7 +3200,7 @@ class Component extends DCLogic {
       nudgeUp: () => this.nudge('up'), nudgeDown: () => this.nudge('down'),
       nudgeIn: () => this.nudge('in'), nudgeOut: () => this.nudge('out'),
       zoomLabel: walk ? '前進' : '推近', zoomOutLabel: walk ? '後退' : '拉遠',
-      closePanel: () => this.setState({ panel:null }),
+      closePanel: () => this.setState({ panel:null, panelPhase:'shell' }),
       panelOpen: this.state.panel != null,
       panelDotRef: this.panelDot,
       pTitle: p ? p.title : '', pSym: p ? p.sym : '',

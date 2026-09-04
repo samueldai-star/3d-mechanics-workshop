@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>預覽 · 角落進入流程（殼 → 展開分頁與預覽）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin:0; height:100%; background:#0b0705; font-family:'Noto Sans TC',sans-serif; }
+  #note { position:fixed; left:0; right:0; top:0; z-index:99; background:#3a1d0a; color:#f0c98a; font-family:'IBM Plex Mono',monospace; font-size:12px; padding:7px 16px; line-height:1.5; }
+  #stage { position:absolute; inset:0; top:52px; }
+  #scene { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 40%, #241408, #0b0705 75%); display:flex; align-items:center; justify-content:center; }
+  #hotspot { display:flex; align-items:center; gap:10px; padding:12px 22px 12px 16px; border-radius:999px; background:linear-gradient(180deg, rgba(42,27,15,.95), rgba(24,15,8,.95)); border:1px solid rgba(206,150,78,.5); cursor:pointer; }
+  #hotspot:hover { border-color:#e5a860; }
+  #hotspot .dot { width:11px; height:11px; border-radius:50%; background:#4fc3ff; box-shadow:0 0 10px 3px rgba(79,195,255,.6); }
+  #hotspot .t { font-family:'Noto Serif TC',serif; font-weight:700; font-size:16px; color:#f4e2c6; }
+  #hotspot .s { font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#bd935d; }
+  #transiting { position:absolute; left:50%; bottom:40px; transform:translateX(-50%); font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.2em; color:#c8a06a; opacity:0; transition:opacity .2s; }
+
+  #panelRoot { position:absolute; inset:0; z-index:20; display:none; padding:24px; background:linear-gradient(180deg, rgba(8,5,3,.84), rgba(8,5,3,.93)); box-sizing:border-box; }
+  #panelCard { position:relative; width:100%; height:100%; display:flex; flex-direction:column; border-radius:20px; overflow:hidden; border:2px solid #8a5f31; background:linear-gradient(178deg,#f4e6cd 0%, #eedaba 40%, #e7d0aa 100%); box-shadow:0 40px 90px rgba(0,0,0,.66), inset 0 2px 0 rgba(255,255,255,.6); box-sizing:border-box; }
+  @keyframes panelIn { from { opacity:0; transform:translateY(20px) scale(.985);} to { opacity:1; transform:none;} }
+  @keyframes panelExpand { from { opacity:0; transform:translateY(14px);} to { opacity:1; transform:none;} }
+  #panelHead { position:relative; display:flex; align-items:center; justify-content:space-between; gap:22px; padding:17px 24px; background:linear-gradient(180deg,#cb9557,#b17e44); border-bottom:2px solid #8a5f31; }
+  #panelHead .left { display:flex; align-items:center; gap:16px; min-width:0; }
+  #panelDot { width:12px; height:12px; flex:0 0 12px; border-radius:50%; background:#4fc3ff; box-shadow:0 0 12px 3px rgba(79,195,255,.5); }
+  #pTitle { font-family:'Noto Serif TC',serif; font-weight:900; font-size:26px; color:#2f1d0c; }
+  #pSym { font-family:'IBM Plex Mono',monospace; font-size:13px; color:#5b3a17; letter-spacing:.14em; }
+  #panelHead .right { display:flex; gap:9px; }
+  #panelHead button { padding:9px 15px; border-radius:9px; border:1px solid #8a5f31; background:rgba(255,246,230,.52); color:#3d2711; font-size:13px; font-weight:700; cursor:pointer; }
+  #closeBtn { background:linear-gradient(180deg,#8a5f31,#6f4a24) !important; color:#f8ecd8 !important; border-color:#6b4520 !important; }
+
+  #tabsBar { position:relative; display:flex; align-items:center; gap:7px; padding:11px 22px; background:linear-gradient(180deg,#f7ecd8,#f0e0c4); border-bottom:1px solid #cfae7d; overflow-x:auto; opacity:0; }
+  #tabsBar .tab { padding:8px 15px; border-radius:8px; border:1px solid #d3b184; background:rgba(255,255,255,.5); font-size:13px; font-weight:500; color:#6b4a22; white-space:nowrap; cursor:pointer; }
+  #tabsBar .tab.active { background:#fff; border-color:#b6883f; font-weight:700; }
+
+  #panelBody { position:relative; flex:1; display:grid; grid-template-columns:1fr 300px; gap:20px; padding:20px 22px 22px; min-height:0; opacity:0; box-sizing:border-box; }
+  #mainCol { display:flex; flex-direction:column; gap:13px; min-height:0; }
+  #slotWrap { position:relative; flex:1; border-radius:14px; border:1px solid #b28a55; background:linear-gradient(180deg, rgba(255,251,242,.86), rgba(246,235,214,.86)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; min-height:0; }
+  #slot { position:absolute; inset:0; display:none; }
+  #slotHint { display:flex; flex-direction:column; align-items:center; gap:9px; }
+  #slotHint .k { font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7e97ab; }
+  #slotHint .t { font-family:'Noto Serif TC',serif; font-size:20px; font-weight:700; color:#5b3f1e; }
+  #slotHint .s { font-size:13px; color:#8a6a3f; }
+  #formulaBar { display:flex; align-items:center; gap:14px; padding:15px 21px; border-radius:12px; background:linear-gradient(180deg,#fdf6e8,#f4e8d1); border:1px solid #cfae7d; }
+  #formulaBar .k { font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.2em; color:#9a7743; }
+  #formulaBar .v { font-family:'Noto Serif TC',serif; font-size:28px; font-weight:700; color:#33200e; }
+  #side { display:flex; flex-direction:column; gap:11px; padding:17px; border-radius:14px; background:linear-gradient(180deg,#fdf7e9,#f2e4c9); border:1px solid #cfae7d; overflow:auto; box-sizing:border-box; }
+  #side .hd { display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.2em; color:#7e97ab; }
+  #liveDot { margin-left:auto; width:6px; height:6px; border-radius:50%; background:#b28a55; }
+  #readouts .ro { display:flex; justify-content:space-between; padding:10px 12px; border-radius:9px; background:rgba(255,255,255,.66); border:1px solid #ddc399; margin-top:8px; }
+  #readouts .rok { font-family:'IBM Plex Mono',monospace; font-size:13.5px; font-weight:600; color:#6b4a22; }
+  #readouts .rov { font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600; color:#2f1d0c; }
+</style>
+</head>
+<body>
+<div id="note">此頁直接從 <b>design/mechanics-workshop.dc.html</b> 抓取 &lt;script type="text/x-dc"&gt; 內的真實 Component 邏輯（openCorner / paintPanelPhase / syncSim 等一字不改），只是自己刻了一組對照樣式的 DOM 取代 x-dc 樣板引擎與 3D 場景 —— 用來驗證「殼 → 展開分頁與預覽」的真實時序與 turntable:3 掛載，不是真的工坊 3D 畫面。</div>
+<div id="stage">
+  <div id="scene">
+    <div id="hotspot">
+      <span class="dot"></span>
+      <span class="t">旋轉圓盤平台</span>
+      <span class="s">τ = rF sinθ</span>
+    </div>
+    <div id="transiting">鏡頭轉場中…</div>
+  </div>
+
+  <div id="panelRoot">
+    <div id="panelCard">
+      <div id="panelHead">
+        <div class="left">
+          <span id="panelDot"></span>
+          <div id="pTitle"></div>
+          <div id="pSym"></div>
+        </div>
+        <div class="right">
+          <button id="fullBtn">全螢幕投影</button>
+          <button id="closeBtn">回到工坊</button>
+        </div>
+      </div>
+      <div id="tabsBar"></div>
+      <div id="panelBody">
+        <div id="mainCol">
+          <div id="slotWrap">
+            <div id="slot"></div>
+            <div id="slotHint">
+              <div class="k">SIMULATION SLOT</div>
+              <div class="t" id="pTabLabel"></div>
+              <div class="s" id="slotKeyLabel"></div>
+            </div>
+          </div>
+          <div id="formulaBar">
+            <span class="k">FORMULA</span>
+            <span class="v" id="pFormula"></span>
+          </div>
+        </div>
+        <div id="side">
+          <div class="hd"><span>LIVE DATA</span><span id="liveDot"></span></div>
+          <div id="readouts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createTurntable3Sim } from '../src/simulators/turntable/3.js';
+
+  class DCLogic {
+    constructor(props){ this.props = props || {}; }
+    setState(patch, cb){
+      const prev = { ...this.state };
+      const next = typeof patch === 'function' ? patch(this.state) : patch;
+      Object.assign(this.state, next);
+      if (this.componentDidUpdate) this.componentDidUpdate(this.props, prev);
+      applyRenderVals();
+      if (cb) cb();
+    }
+  }
+  const React = { createRef: () => ({ current: null }) };
+
+  async function loadDcLogic(){
+    const res = await fetch('../design/mechanics-workshop.dc.html');
+    const html = await res.text();
+    const m = html.match(/<script type="text\/x-dc"[^>]*>([\s\S]*?)<\/script>/);
+    if (!m) throw new Error('在 mechanics-workshop.dc.html 裡找不到 <script type="text/x-dc"> 區塊');
+    const code = m[1] + '\nreturn { Component, CORNERS, AREAS, EXITS };';
+    const factory = new Function('DCLogic', 'React', code);
+    return factory(DCLogic, React);
+  }
+
+  const { Component, CORNERS } = await loadDcLogic();
+  const turntableIndex = CORNERS.findIndex(c => c.id === 'turntable');
+
+  window.WorkshopSimulators = {
+    _f: {}, _hosts: [],
+    register(key, factory){ this._f[key] = factory; this._hosts.forEach(h => h.syncSim()); return this; },
+    get(key){ return this._f[key]; },
+    keys(){ return Object.keys(this._f); }
+  };
+  window.WorkshopSimulators.register('turntable:3', () => createTurntable3Sim());
+
+  const inst = new Component({});
+  inst.state = { mode:'orbit', panel:null, tab:0, mapOpen:true, here:null, area:'workshop', panelPhase:'shell' };
+  inst.slot = { current: document.getElementById('slot') };
+  inst.slotHint = { current: document.getElementById('slotHint') };
+  inst.liveDot = { current: document.getElementById('liveDot') };
+  inst.panelRoot = { current: document.getElementById('panelCard') };
+  inst.tabsBar = { current: document.getElementById('tabsBar') };
+  inst.panelBody = { current: document.getElementById('panelBody') };
+  inst.panelDot = { current: document.getElementById('panelDot') };
+  inst._hosts = window.WorkshopSimulators._hosts;
+  window.WorkshopSimulators._hosts.push(inst);
+
+  // 沒有真實 THREE.js 場景與鏡頭可轉場，focusCorner 只保留「開始轉場」這個時間點的意義。
+  inst.focusCorner = () => {
+    document.getElementById('transiting').style.opacity = '1';
+    setTimeout(() => { document.getElementById('transiting').style.opacity = '0'; }, 700);
+  };
+
+  function applyRenderVals(){
+    const v = inst.renderVals();
+    document.getElementById('panelRoot').style.display = v.panelOpen ? 'flex' : 'none';
+    document.getElementById('pTitle').textContent = v.pTitle;
+    document.getElementById('pSym').textContent = v.pSym;
+    document.getElementById('pFormula').textContent = v.pFormula;
+    document.getElementById('pTabLabel').textContent = v.pTabLabel;
+    document.getElementById('slotKeyLabel').textContent = v.slotKeyLabel;
+
+    const tabsEl = document.getElementById('tabsBar');
+    tabsEl.innerHTML = '';
+    v.pTabs.forEach((tb, i) => {
+      const d = document.createElement('div');
+      d.className = 'tab' + (i === inst.state.tab ? ' active' : '');
+      d.textContent = tb.label;
+      d.onclick = tb.onClick;
+      tabsEl.appendChild(d);
+    });
+
+    const roEl = document.getElementById('readouts');
+    roEl.innerHTML = '';
+    v.pReadouts.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'ro';
+      row.innerHTML = `<span class="rok" data-p-rok="1">${r.k}</span><span class="rov" data-p-rov="1">${r.v}</span>`;
+      row.setAttribute('data-p-ro', '1');
+      roEl.appendChild(row);
+    });
+
+    document.getElementById('closeBtn').onclick = v.closePanel;
+    document.getElementById('fullBtn').onclick = v.toggleFull;
+  }
+
+  applyRenderVals();
+
+  document.getElementById('hotspot').addEventListener('click', () => inst.openCorner(turntableIndex));
+</script>
+</body>
+</html>

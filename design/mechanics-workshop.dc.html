@@ -139,9 +139,10 @@
 
         <div ref="{{ panelBodyRef }}" style="position:relative; flex:1; display:grid; grid-template-columns:1fr 318px; gap:20px; padding:20px 22px 22px; min-height:0; opacity:0;">
           <div style="display:flex; flex-direction:column; gap:13px; min-height:0;">
-            <div data-p-slot="1" style="position:relative; flex:1; border-radius:14px; border:1px solid #b28a55; background:linear-gradient(180deg, rgba(255,251,242,.86), rgba(246,235,214,.86)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; min-height:0; box-shadow:inset 0 0 0 1px rgba(120,175,215,.28), inset 0 1px 0 #fff;">
+            <div ref="{{ slotBoxRef }}" data-p-slot="1" style="position:relative; flex:1; border-radius:14px; border:1px solid #b28a55; background:linear-gradient(180deg, rgba(255,251,242,.86), rgba(246,235,214,.86)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; min-height:0; box-shadow:inset 0 0 0 1px rgba(120,175,215,.28), inset 0 1px 0 #fff;">
               <div style="position:absolute; left:0; top:0; width:26px; height:26px; border-left:2px solid rgba(60,140,190,.5); border-top:2px solid rgba(60,140,190,.5); border-top-left-radius:13px;"></div>
               <div style="position:absolute; right:0; bottom:0; width:26px; height:26px; border-right:2px solid rgba(60,140,190,.5); border-bottom:2px solid rgba(60,140,190,.5); border-bottom-right-radius:13px;"></div>
+              <button ref="{{ exitFsBtnRef }}" onClick="{{ exitSlotFullscreen }}" style="display:none; position:absolute; right:10px; top:10px; z-index:6; align-items:center; gap:6px; padding:8px 13px; border-radius:8px; border:1px solid #8a5f31; background:rgba(255,246,230,.92); color:#3d2711; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.25);" style-hover="background:#fff6e6;">✕ 退出全螢幕</button>
               <div ref="{{ slotRef }}" style="position:absolute; inset:0; display:none;"></div>
               <div ref="{{ slotHintRef }}" style="display:flex; flex-direction:column; align-items:center; gap:9px;">
                 <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7e97ab;">SIMULATION SLOT</div>
@@ -333,6 +334,8 @@ class Component extends DCLogic {
     this.diag = React.createRef();
     this.slot = React.createRef();
     this.slotHint = React.createRef();
+    this.slotBox = React.createRef();
+    this.exitFsBtn = React.createRef();
     this.tabsBar = React.createRef();
     this.panelBody = React.createRef();
     this.liveDot = React.createRef();
@@ -444,6 +447,7 @@ class Component extends DCLogic {
     window.removeEventListener('blur', this._endLook);
     document.removeEventListener('fullscreenchange', this._endLook);
     document.removeEventListener('fullscreenchange', this._flushPointers);
+    document.removeEventListener('fullscreenchange', this._onFsChange);
     window.removeEventListener('blur', this._flushPointers);
     document.removeEventListener('visibilitychange', this._flushPointers);
     document.removeEventListener('visibilitychange', this._clearKeys);
@@ -578,6 +582,13 @@ class Component extends DCLogic {
     document.addEventListener('fullscreenchange', this._flushPointers);
     window.addEventListener('blur', this._flushPointers);
     document.addEventListener('visibilitychange', this._flushPointers);
+    // toggleFull 現在只把 SIMULATION SLOT 全螢幕，標題列的「回到工坊」按鈕在全螢幕時看不到，
+    // 所以在 slot 右上角另外放一顆退出鍵，只在真的處於全螢幕時顯示。
+    this._onFsChange = () => {
+      const btn = this.exitFsBtn.current;
+      if (btn) btn.style.display = document.fullscreenElement ? 'flex' : 'none';
+    };
+    document.addEventListener('fullscreenchange', this._onFsChange);
     renderer.domElement.addEventListener('pointerup', endLook);
     renderer.domElement.addEventListener('pointercancel', endLook);
     renderer.domElement.addEventListener('lostpointercapture', endLook);
@@ -3157,6 +3168,8 @@ class Component extends DCLogic {
       panelRootRef: this.panelRoot,
       diagRef: this.diag,
       slotRef: this.slot, slotHintRef: this.slotHint, liveDotRef: this.liveDot,
+      slotBoxRef: this.slotBox, exitFsBtnRef: this.exitFsBtn,
+      exitSlotFullscreen: () => { if (document.fullscreenElement) document.exitFullscreen(); },
       tabsBarRef: this.tabsBar, panelBodyRef: this.panelBody,
       slotKeyLabel: p ? ('等待 repo 模擬器 · ' + p.id + ':' + this.state.tab) : '',
       fxRootRef: this.fxRoot, fxFillRef: this.fxFill, fxVeilRef: this.fxVeil,
@@ -3191,7 +3204,9 @@ class Component extends DCLogic {
         if (this.home) this.tween(this.home.pos, this.home.target, 820);
       },
       toggleFull: () => {
-        const el = this.root.current || document.documentElement;
+        // 只把中央模擬畫面（SIMULATION SLOT）全螢幕，不含標題列／分頁列／FORMULA／LIVE DATA，
+        // 模擬器自己畫的參數調整面板本來就在這個容器裡，所以全螢幕時會一起放大。
+        const el = this.slotBox.current || this.root.current || document.documentElement;
         if (this._flushPointers) this._flushPointers();
         if (document.fullscreenElement) document.exitFullscreen();
         else if (el.requestFullscreen) el.requestFullscreen();

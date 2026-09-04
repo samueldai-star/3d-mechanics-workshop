@@ -39,6 +39,7 @@
   #panelBody { position:relative; flex:1; display:grid; grid-template-columns:1fr 300px; gap:20px; padding:20px 22px 22px; min-height:0; opacity:0; box-sizing:border-box; }
   #mainCol { display:flex; flex-direction:column; gap:13px; min-height:0; }
   #slotWrap { position:relative; flex:1; border-radius:14px; border:1px solid #b28a55; background:linear-gradient(180deg, rgba(255,251,242,.86), rgba(246,235,214,.86)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; min-height:0; }
+  #exitFsBtn { display:none; position:absolute; right:10px; top:10px; z-index:6; align-items:center; gap:6px; padding:8px 13px; border-radius:8px; border:1px solid #8a5f31; background:rgba(255,246,230,.92); color:#3d2711; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.25); }
   #slot { position:absolute; inset:0; display:none; }
   #slotHint { display:flex; flex-direction:column; align-items:center; gap:9px; }
   #slotHint .k { font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7e97ab; }
@@ -84,6 +85,7 @@
       <div id="panelBody">
         <div id="mainCol">
           <div id="slotWrap">
+            <button id="exitFsBtn">✕ 退出全螢幕</button>
             <div id="slot"></div>
             <div id="slotHint">
               <div class="k">SIMULATION SLOT</div>
@@ -151,8 +153,16 @@
   inst.tabsBar = { current: document.getElementById('tabsBar') };
   inst.panelBody = { current: document.getElementById('panelBody') };
   inst.panelDot = { current: document.getElementById('panelDot') };
+  inst.slotBox = { current: document.getElementById('slotWrap') };
+  inst.exitFsBtn = { current: document.getElementById('exitFsBtn') };
   inst._hosts = window.WorkshopSimulators._hosts;
   window.WorkshopSimulators._hosts.push(inst);
+
+  // 真實檔案這段邏輯掛在 componentDidMount，這裡沒有呼叫完整生命週期，手動補上同樣的監聽。
+  document.addEventListener('fullscreenchange', () => {
+    const btn = inst.exitFsBtn.current;
+    if (btn) btn.style.display = document.fullscreenElement ? 'flex' : 'none';
+  });
 
   // 沒有真實 THREE.js 場景與鏡頭可轉場，focusCorner 只保留「開始轉場」這個時間點的意義。
   inst.focusCorner = () => {
@@ -191,6 +201,7 @@
 
     document.getElementById('closeBtn').onclick = v.closePanel;
     document.getElementById('fullBtn').onclick = v.toggleFull;
+    document.getElementById('exitFsBtn').onclick = v.exitSlotFullscreen;
   }
 
   applyRenderVals();

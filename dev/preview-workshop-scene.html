@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>預覽 · 工坊 3D 場景（真實樣板，非 mock）</title>
+<script src="../vendor/react.production.min.js"></script>
+<script src="../vendor/react-dom.production.min.js"></script>
+<style>
+  #note { position:fixed; left:0; right:0; top:0; z-index:999; background:#3a1d0a; color:#f0c98a; font-family:'IBM Plex Mono',monospace; font-size:12px; padding:7px 16px; line-height:1.5; }
+  #app { position:absolute; inset:0; top:70px; }
+  #boot-status { position:fixed; left:16px; bottom:12px; z-index:999; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#f0c98a; background:rgba(0,0,0,.6); padding:6px 10px; border-radius:6px; }
+</style>
+</head>
+<body style="margin:0;">
+<div id="note">
+  這頁跑的是<b>真實</b> mechanics-workshop.dc.html 的樣板＋邏輯（一字不改），用 <code>dev/xdc-runtime.js</code>
+  （repo 端自己寫的 x-dc → React 編譯器，不是 Claude Design 的 support.js）即時編譯渲染，接上真正的
+  <code>vendor/</code> three.js 與 React。3D 世界建置在 <code>boot()</code> 內用 <code>import('https://esm.sh/three@…')</code>
+  抓 OrbitControls，這段是設計端原始碼、沒有動——如果你的瀏覽器能連外网，這裡应该整個 3D 場景都會動起來。
+</div>
+<div id="app"></div>
+<div id="boot-status">載入中…</div>
+
+<script type="module">
+  import { compileTemplate, extractParts } from './xdc-runtime.js';
+
+  const statusEl = document.getElementById('boot-status');
+  const setStatus = s => { statusEl.textContent = s; console.log('[preview]', s); };
+
+  async function ensureThree() {
+    if (window.THREE) return window.THREE;
+    const mod = await import('../vendor/three.module.js');
+    window.THREE = mod;
+    return mod;
+  }
+
+  async function main() {
+    setStatus('載入 three.js…');
+    await ensureThree();
+
+    setStatus('抓取 mechanics-workshop.dc.html…');
+    const res = await fetch('../design/mechanics-workshop.dc.html');
+    const html = await res.text();
+
+    setStatus('解析樣板與邏輯…');
+    const { templateRoot, styleText, scriptCode } = extractParts(html);
+
+    const style = document.createElement('style');
+    style.textContent = styleText;
+    document.head.appendChild(style);
+
+    const compiledRender = compileTemplate(templateRoot, window.React);
+
+    class DCLogic extends window.React.Component {
+      render() { return compiledRender(this.renderVals()); }
+    }
+
+    setStatus('執行場景邏輯（class Component）…');
+    const factory = new Function('DCLogic', 'React', scriptCode + '\nreturn Component;');
+    const Component = factory(DCLogic, window.React);
+
+    window.WorkshopSimulators = window.WorkshopSimulators || {
+      _f: {}, _hosts: [],
+      register(key, factory){ this._f[key] = factory; (this._hosts||[]).forEach(h => h.syncSim && h.syncSim()); return this; },
+      get(key){ return this._f[key]; },
+      keys(){ return Object.keys(this._f); }
+    };
+    const { createTurntable3Sim } = await import('../src/simulators/turntable/3.js');
+    window.WorkshopSimulators.register('turntable:3', () => createTurntable3Sim());
+
+    setStatus('掛載 React…');
+    const root = window.ReactDOM.createRoot(document.getElementById('app'));
+    root.render(window.React.createElement(Component, { showDiagnostics: false }));
+
+    setStatus('已掛載。若場景全黑無互動，多半是 boot() 內對 esm.sh 的 three.js 動態載入被目前瀏覽器環境擋掉——換一般瀏覽器開這個網址即可。');
+  }
+
+  main().catch(e => {
+    setStatus('錯誤：' + e.message);
+    console.error(e);
+  });
+</script>
+</body>
+</html>
